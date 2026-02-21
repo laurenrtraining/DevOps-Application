@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Account</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen flex flex-col bg-cyan-600">
+    <!-- Navbar -->
+    {% include 'navbar/navbar.html' %}
+
+    <!-- Main Body -->
+    <main class="flex-grow mx-auto px-4 py-1 text-white text-center">
+      <div class="p-8">
+        <h1 class="text-3xl font-bold">Hello {{staff_username}}</h1>
+      </div>
+
+      <div class="flex flex-col space-y-2">
+        <a href="{{ url_for('update_account') }}">
+          <button
+            class="bg-gray-500 text-white px-4 py-2 rounded-full text-sm hover:bg-gray-600"
+          >
+            Edit Account
+          </button>
+        </a>
+
+        {% if job_role == 'Admin' %}
+        <div class="p-8">
+          <h1 class="text-3xl font-bold">Admins cannot delete their account</h1>
+        </div>
+
+        {% else %}
+        <!-- Delete Account -->
+        <button
+          onclick="openDeleteModal()"
+          class="bg-red-600 text-white px-4 py-2 rounded-full text-sm hover:bg-red-700"
+        >
+          Delete Account
+        </button>
+      </div>
+
+      <!-- Confirmation deletion of account -->
+      <div
+        id="confirmDeleteModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50"
+      >
+        <div
+          class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center text-black"
+        >
+          <h2 class="text-xl font-bold mb-4">Are you sure?</h2>
+          <p class="mb-6">This will permanently delete your account</p>
+          <form
+            method="POST"
+            action="{{ url_for('delete_account', staff_id=staff.staff_id) }}"
+          >
+            <button
+              type="submit"
+              class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mr-2"
+            >
+              Confirm Account Deletion
+            </button>
+            <button
+              type="button"
+              onclick="closeDeleteModal()"
+              class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+    </main>
+
+    <!-- Footer -->
+    {% include 'footer/footer.html' %}
+
+    <script>
+      // Modal was created using code from (W3Schools, 2025)
+      // Modal functions to open and close the functions are here
+      function openDeleteModal() {
+        document
+          .getElementById("confirmDeleteModal")
+          .classList.remove("hidden");
+      }
+      // Removing hidden makes modal visible
+
+      function closeDeleteModal() {
+        document.getElementById("confirmDeleteModal").classList.add("hidden");
+      }
+      // Adding hidden hides modal again
+    </script>
+  </body>
+</html>
+
+<!-- Code to create success message popup -->
+{% if success %}
+<style>
+  @keyframes slideUp {
+    0% {
+      transform: translate(-50%, 100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+  }
+
+  #alert {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: green;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 300px;
+    animation: slideUp 0.5s ease-out;
+  }
+</style>
+
+<div id="alert">
+  <span>{{ success }}</span>
+  <button
+    onclick="closeAlert()"
+    style="
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      margin-left: 16px;
+      cursor: pointer;
+    "
+  >
+    &times;
+  </button>
+</div>
+
+<script>
+  function closeAlert() {
+    const alert = document.getElementById("alert");
+    if (alert) {
+      alert.style.display = "none";
+    }
+  }
+
+  // Auto-close after 5 seconds
+  setTimeout(closeAlert, 5000);
+</script>
+{% endif %}

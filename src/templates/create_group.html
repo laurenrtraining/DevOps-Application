@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Social Societies</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+
+  <body class="min-h-screen flex flex-col bg-cyan-600">
+    <!-- Navbar -->
+    {% include 'navbar/navbar.html' %}
+
+    <!-- Main Body -->
+    <main class="flex-grow flex items-center justify-center">
+      <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
+        <!-- Tailwind for create group box -->
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">
+          Create Group
+        </h2>
+        <!-- This is the modal for the create group section -->
+
+        <form
+          action="{{ url_for('submit_group') }}"
+          method="POST"
+          enctype="multipart/form-data"
+          class="space-y-4"
+        >
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700"
+              >Group Name</label
+            >
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Group Name"
+              required
+              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <!-- Text input for group name -->
+          </div>
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700"
+              >Description</label
+            >
+            <textarea
+              type="text"
+              id="description"
+              name="description"
+              placeholder="Description"
+              class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></textarea>
+            <!-- Text input for description - this can be left empty -->
+          </div>
+          <div>
+            <input type="file" name="image_filename" />
+          </div>
+          <!-- An image can be added - if no image, a default one is added -->
+          <div>
+            <button
+              type="submit"
+              class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200"
+            >
+              Create Group
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    {% include 'footer/footer.html' %}
+  </body>
+</html>
+
+<!-- Code to create success message popup -->
+{% if error %}
+<style>
+  @keyframes slideUp {
+    0% {
+      transform: translate(-50%, 100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+  }
+
+  #alert {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f44336;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 300px;
+    animation: slideUp 0.5s ease-out;
+  }
+</style>
+
+<div id="alert">
+  <span>{{ error }}</span>
+  <button
+    onclick="closeAlert()"
+    style="
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      margin-left: 16px;
+      cursor: pointer;
+    "
+  >
+    &times;
+  </button>
+</div>
+
+<script>
+  function closeAlert() {
+    const alert = document.getElementById("alert");
+    if (alert) {
+      alert.style.display = "none";
+    }
+  }
+
+  // Auto-close after 5 seconds
+  setTimeout(closeAlert, 5000);
+</script>
+{% endif %}

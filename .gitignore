@@ -1,0 +1,16 @@
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+
+# Ignore virtual environments
+my-venv/
+
+# Ignore DB and instance folders
+# instance/FLASK_DATABASE.db
+
+# Ignore VS Code settings (optional)
+.vscode/
+
+# Ignore compiled files
+*.log
+instance/FLASK_DATABASE.db
