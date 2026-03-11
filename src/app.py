@@ -180,7 +180,7 @@ def verification():
     db.session.commit()
     session.pop("mfa_user")
 
-    return redirect(url_for("index"))
+    return redirect(url_for("index", success="Verification Successful"))
     
 
 @app.route("/mfa")
@@ -213,7 +213,7 @@ def resend_code():
     session["mfa_user"] = user.staff_id
     print("NEW MFA CODE:", code)
     send_email(user.staff_email, code)
-    return render_template("mfa_verify.html", error="A new verification email has been sent")
+    return render_template("mfa_verify.html", success="A new verification email has been sent")
 
 @app.route("/logout")
 def logout():
