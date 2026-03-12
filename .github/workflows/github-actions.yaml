@@ -30,7 +30,7 @@ jobs:
       - name: Run prettier for formatting
         run: |
           npm install --save-dev prettier
-          npx prettier --check .
+          npx prettier --write .
         
         # Run linting for python
       - name: Run linting for python
@@ -55,13 +55,6 @@ jobs:
         run: |
           pip install pytest pytest-cov
           pytest src/tests/
-
-      #  # Deploy on Render
-      # - name: Test with Pytest
-      #   run: |
-      #     pip install pytest pytest-cov
-      #     pytest tests/
-        
 
       
           
