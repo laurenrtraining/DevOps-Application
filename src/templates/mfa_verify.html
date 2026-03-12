@@ -19,9 +19,7 @@
         class="space-y-4"
       >
         <div>
-          <label
-            for="token"
-            class="block text-sm font-medium text-gray-700"
+          <label for="token" class="block text-sm font-medium text-gray-700"
             >6-Digit Code</label
           >
           <!-- Enter username -->
@@ -45,7 +43,9 @@
 
       <p class="text-sm text-center text-gray-600 mt-4">
         Not recieved code?
-        <a href="{{ url_for('resend_code') }}" class="text-blue-600 hover:underline"
+        <a
+          href="{{ url_for('resend_code') }}"
+          class="text-blue-600 hover:underline"
           >Resend code</a
         >
       </p>
@@ -131,7 +131,6 @@
   setTimeout(closeAlert, 5000);
 </script>
 {% endif %}
-
 
 <!-- Code to create success message popup -->
 {% if success %}
