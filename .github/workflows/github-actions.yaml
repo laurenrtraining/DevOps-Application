@@ -1,6 +1,6 @@
 name: Social Societies CI/CD Pipeline
 run-name: CI/CD pipeline functionality for Social Societies Web Application
-on: 
+on:
   push:
     branches: [main, initiate-pipeline]
   pull_request:
@@ -21,7 +21,7 @@ jobs:
       - name: Python init
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.9.1"
 
         # Setup Node
       - name: Setup Node
@@ -34,7 +34,7 @@ jobs:
         run: |
           npm install --save-dev prettier
           npx prettier --check .
-        
+
         # Run linting for python
       - name: Run linting for python
         run: |
@@ -52,13 +52,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install -r src/requirements.txt
-        
+
         # Run pytest
       - name: Test with Pytest
         run: |
           pip install pytest pytest-cov
           pytest src/tests/
-
-      
-          
-
