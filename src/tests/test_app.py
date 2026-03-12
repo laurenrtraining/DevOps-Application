@@ -1,12 +1,14 @@
+# flake8: noqa: E402
+
 import sys
 import os
 import pytest
 from datetime import date, timedelta
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))) # flake8: noqa: E402
-# Ensures the test file looks in the correct place for app (Pytest, 2025).
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+#   Ensures the test file looks in the correct place for app (Pytest, 2025).
 
-from app import app # flake8: noqa: E402
+from app import app
 from database.database import (
     db,
     Staff,
@@ -14,21 +16,21 @@ from database.database import (
     Staff_Societies,
     Date_Availability,
     MfaTokens,
-) # flake8: noqa: E402
-from utils import hash_password # flake8: noqa: E402
+)
+from utils import hash_password
 
 
 @pytest.fixture
-# Client function simulates the database and prevents tests against real data
+#  Client function simulates the database and prevents tests against real data
 def client():
     app.config["TESTING"] = True
     app.config["WTF_CSRF_ENABLED"] = False
     app.config["MAIL_SUPPRESS_SEND"] = (
-        True  # prevents real emails being sent to fake accounts
+        True  #  prevents real emails being sent to fake accounts
     )
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://:memory:' # (SQLite, 2022)
+    #  app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://:memory:' #  (SQLite, 2022)
 
-    # Initialising client (Flask, 2024)
+    #  Initialising client (Flask, 2024)
     with app.app_context():
         db.create_all()
 
@@ -37,24 +39,24 @@ def client():
 
         db.session.remove()
         db.drop_all()
-        # After running the tests, they are deleted from the database
+        #  After running the tests, they are deleted from the database
 
 
-# MAIN TESTS #
+#  MAIN TESTS #
 
 
-# RENDER INDEX PAGE ON STARTUP
+#  RENDER INDEX PAGE ON STARTUP
 def test_render_index_when_logged_out(client):
-    # If no one is logged in and the app is initialised this is what they will see
+    #  If no one is logged in and the app is initialised this is what they will see
     response = client.get("/", follow_redirects=True)
     assert response.status_code == 200
     assert b"Guest" in response.data
 
 
-# SIGN IN #
+#  SIGN IN #
 
-# TESTS THAT MFA FEATURE WORKS WHEN CORRECT CODE IS ENTERED
-# USERS CAN SIGN IN AS NON ADMIN AND ADMIN SUCCESSFULLY AND THAT THE DB SEARCH WORKS
+#  TESTS THAT MFA FEATURE WORKS WHEN CORRECT CODE IS ENTERED
+#  USERS CAN SIGN IN AS NON ADMIN AND ADMIN SUCCESSFULLY AND THAT THE DB SEARCH WORKS
 
 
 def test_sign_in_mfa_email_verification_correct(client):
@@ -74,14 +76,14 @@ def test_sign_in_mfa_email_verification_correct(client):
     )
 
     assert response.status_code == 200
-    # This checks to see if the verification page has been reached with correct details
+    #  This checks to see if the verification page has been reached with correct details
 
     token = MfaTokens.query.filter_by(staff_email="test_user@staff.uk").first()
-    # Grab the token from database
+    #  Grab the token from database
 
     assert token is not None
 
-    # Token submit
+    #  Token submit
     response = client.post(
         "/verify",
         data={"token": token.token},
@@ -92,7 +94,7 @@ def test_sign_in_mfa_email_verification_correct(client):
     assert b"Verification Successful" in response.data
 
 
-# TESTS THAT WHEN WRONG CODE IN ENTERED MFA VALIDATION FAILS
+#  TESTS THAT WHEN WRONG CODE IN ENTERED MFA VALIDATION FAILS
 
 
 def test_mfa_email_verification_incorrect(client):
@@ -112,14 +114,14 @@ def test_mfa_email_verification_incorrect(client):
     )
 
     assert response.status_code == 200
-    # This checks to see if the verification page has been reached with correct details
+    #  This checks to see if the verification page has been reached with correct details
 
     token = MfaTokens.query.filter_by(staff_email="test_user@staff.uk").first()
-    # Grab the token from database
+    #  Grab the token from database
 
     assert token is not None
 
-    # Token submit
+    #  Token submit
     response = client.post(
         "/verify",
         data={"token": "123456"},
@@ -129,9 +131,9 @@ def test_mfa_email_verification_incorrect(client):
     assert b"Token invalid" in response.data
 
 
-# TESTS THAT VALIDATION WORKS BY INPUTTING INCORRECT PASSWORD
+#  TESTS THAT VALIDATION WORKS BY INPUTTING INCORRECT PASSWORD
 def test_user_sign_in_fail(client):
-    # Gets to the sign in page first
+    #  Gets to the sign in page first
     response = client.get("/sign_in.html")
     assert response.status_code == 200
 
@@ -154,12 +156,12 @@ def test_user_sign_in_fail(client):
     assert b"Invalid username or password" in response.data
 
 
-# REGISTRATION #
+#  REGISTRATION #
 
 
-# TESTS THAT USER REGISTRATION SEARCHED DB BEFORE ALLOWING CREATION - ACCOUNT ALREADY EXISTS
+#  TESTS THAT USER REGISTRATION SEARCHED DB BEFORE ALLOWING CREATION - ACCOUNT ALREADY EXISTS
 def test_user_registration_if_existing(client):
-    # Gets to the sign in page first
+    #  Gets to the sign in page first
     response = client.get("/sign_in.html")
     assert response.status_code == 200
 
@@ -172,10 +174,10 @@ def test_user_registration_if_existing(client):
     db.session.add(staff)
     db.session.commit()
 
-    # Confirm registration option is on the page
+    #  Confirm registration option is on the page
     assert b"Register" in response.data
 
-    # Simulates clicking registration button
+    #  Simulates clicking registration button
     response = client.get("/register.html")
     assert response.status_code == 200
     assert b"Registration Form" in response.data
@@ -193,19 +195,19 @@ def test_user_registration_if_existing(client):
 
     assert response.status_code == 200
     assert b"Email already registered. Please sign in." in response.data
-    # Registration success
+    #  Registration success
 
 
-# TESTS THAT USER REGISTRATION SUCCESSFULLY ADDS TO DB
+#  TESTS THAT USER REGISTRATION SUCCESSFULLY ADDS TO DB
 def test_user_registration_not_preexisting(client):
-    # Gets to the sign in page first
+    #  Gets to the sign in page first
     response = client.get("/sign_in.html")
     assert response.status_code == 200
 
-    # Confirm registration option is on the page
+    #  Confirm registration option is on the page
     assert b"Register" in response.data
 
-    # Simulates clicking registration button
+    #  Simulates clicking registration button
     response = client.get("/register.html")
     assert response.status_code == 200
     assert b"Registration Form" in response.data
@@ -222,14 +224,14 @@ def test_user_registration_not_preexisting(client):
     )
 
     assert response.status_code == 200
-    # This checks to see if the verification page has been reached with correct details
+    #  This checks to see if the verification page has been reached with correct details
 
     token = MfaTokens.query.filter_by(staff_email="test_user@staff.uk").first()
-    # Grab the token from database
+    #  Grab the token from database
 
     assert token is not None
 
-    # Token submit
+    #  Token submit
     response = client.post(
         "/verify",
         data={"token": token.token},
@@ -240,12 +242,12 @@ def test_user_registration_not_preexisting(client):
     assert b"Sign Out" in response.data
 
 
-# CREATE SOCIETIES #
+#  CREATE SOCIETIES #
 
 
-# TESTS THAT USERS CAN CREATE NEW GROUPS
+#  TESTS THAT USERS CAN CREATE NEW GROUPS
 def test_create_groups(client):
-    # Logs in a user
+    #  Logs in a user
     staff = Staff(
         staff_username="test_user",
         job_role="Non Admin",
@@ -261,9 +263,9 @@ def test_create_groups(client):
         follow_redirects=True,
     )
     assert response.status_code == 200
-    #  Log in successful
+    #   Log in successful
 
-    # Simulates staff session
+    #  Simulates staff session
     staff_id = staff.staff_id
 
     with client.session_transaction() as session:
@@ -271,7 +273,7 @@ def test_create_groups(client):
         session["staff_username"] = staff.staff_username
         session["job_role"] = staff.job_role
 
-    # Gets to create group page
+    #  Gets to create group page
     response = client.post(
         "/submit-group",
         data={"name": "test_group", "description": "test description"},
@@ -282,13 +284,13 @@ def test_create_groups(client):
     response = client.get("/")
     assert response.status_code == 200
     assert b"test_group" in response.data
-    # Creates new group successfully
+    #  Creates new group successfully
 
 
-# JOIN, LEAVE AND DELETE SOCIETIES #
+#  JOIN, LEAVE AND DELETE SOCIETIES #
 
 
-# TESTS THAT USERS CAN JOIN GROUPS
+#  TESTS THAT USERS CAN JOIN GROUPS
 def test_join_group(client):
     creator = Staff(
         staff_username="creator",
@@ -299,7 +301,7 @@ def test_join_group(client):
     db.session.add(creator)
     db.session.commit()
 
-    # Logs in a user
+    #  Logs in a user
     staff = Staff(
         staff_username="test_user",
         job_role="Non Admin",
@@ -310,7 +312,7 @@ def test_join_group(client):
     db.session.add(staff)
     db.session.commit()
 
-    # Simulates staff session
+    #  Simulates staff session
     staff_id = staff.staff_id
 
     with client.session_transaction() as session:
@@ -326,16 +328,16 @@ def test_join_group(client):
 
     response = client.post(f"/group/{society.society_id}/join", follow_redirects=True)
     assert response.status_code == 200
-    assert b"Leave Society" in response.data  # Confirm they joined
+    assert b"Leave Society" in response.data  #  Confirm they joined
 
-    # Check the DB to verify the association
+    #  Check the DB to verify the association
     membership = Staff_Societies.query.filter_by(
         staff_id=staff.staff_id, society_id=society.society_id
     ).first()
     assert membership is not None
 
 
-# TESTS THAT USERS CAN LEAVE GROUPS
+#  TESTS THAT USERS CAN LEAVE GROUPS
 def test_leave_group(client):
     creator = Staff(
         staff_username="creator",
@@ -346,7 +348,7 @@ def test_leave_group(client):
     db.session.add(creator)
     db.session.commit()
 
-    # Logs in a user
+    #  Logs in a user
     staff = Staff(
         staff_username="test_user",
         job_role="Non Admin",
@@ -356,7 +358,7 @@ def test_leave_group(client):
     db.session.add(staff)
     db.session.commit()
 
-    # Simulates staff session
+    #  Simulates staff session
     staff_id = staff.staff_id
 
     with client.session_transaction() as session:
@@ -372,27 +374,27 @@ def test_leave_group(client):
 
     response = client.post(f"/group/{society.society_id}/join", follow_redirects=True)
     assert response.status_code == 200
-    assert b"Leave Society" in response.data  # Confirm they joined
+    assert b"Leave Society" in response.data  #  Confirm they joined
 
-    # Check the DB to verify they joined first
+    #  Check the DB to verify they joined first
     membership = Staff_Societies.query.filter_by(
         staff_id=staff.staff_id, society_id=society.society_id
     ).first()
     assert membership is not None
 
-    # Needed to test they joined to compare to when they left
+    #  Needed to test they joined to compare to when they left
     response = client.post(f"/group/{society.society_id}/leave", follow_redirects=True)
     assert response.status_code == 200
-    assert b"Join Society" in response.data  # Confirm they left
+    assert b"Join Society" in response.data  #  Confirm they left
 
-    # Check the DB to verify they left
+    #  Check the DB to verify they left
     membership = Staff_Societies.query.filter_by(
         staff_id=staff.staff_id, society_id=society.society_id
     ).first()
     assert membership is None
 
 
-# TESTS THAT ADMIN CAN DELETE GROUPS
+#  TESTS THAT ADMIN CAN DELETE GROUPS
 def test_delete_group_as_admin(client):
     creator = Staff(
         staff_username="creator",
@@ -403,7 +405,7 @@ def test_delete_group_as_admin(client):
     db.session.add(creator)
     db.session.commit()
 
-    # Logs in a user
+    #  Logs in a user
     staff = Staff(
         staff_username="test_user",
         job_role="Admin",
@@ -413,7 +415,7 @@ def test_delete_group_as_admin(client):
     db.session.add(staff)
     db.session.commit()
 
-    # Simulates staff session
+    #  Simulates staff session
     staff_id = staff.staff_id
 
     with client.session_transaction() as session:
@@ -429,14 +431,14 @@ def test_delete_group_as_admin(client):
 
     response = client.post(f"/group/{society.society_id}/delete", follow_redirects=True)
     assert response.status_code == 200
-    # Confirm deletion
+    #  Confirm deletion
 
-    # Check the DB to verify society deletion
+    #  Check the DB to verify society deletion
     society = Societies.query.filter_by(society_id=society.society_id).first()
     assert society is None
 
 
-# TESTS THAT PAGE OWNER CAN DELETE GROUPS
+#  TESTS THAT PAGE OWNER CAN DELETE GROUPS
 def test_delete_group_non_admin(client):
     creator = Staff(
         staff_username="creator",
@@ -447,7 +449,7 @@ def test_delete_group_non_admin(client):
     db.session.add(creator)
     db.session.commit()
 
-    # Simulates staff session
+    #  Simulates staff session
     staff_id = creator.staff_id
 
     with client.session_transaction() as session:
@@ -463,17 +465,17 @@ def test_delete_group_non_admin(client):
 
     response = client.post(f"/group/{society.society_id}/delete", follow_redirects=True)
     assert response.status_code == 200
-    # Confirm deletion
+    #  Confirm deletion
 
-    # Check the DB to verify society deletion
+    #  Check the DB to verify society deletion
     society = Societies.query.filter_by(society_id=society.society_id).first()
     assert society is None
 
 
-# TESTS TO EDIT GROUP DETAILS #
+#  TESTS TO EDIT GROUP DETAILS #
 
 
-# TESTS THAT ADMIN CAN EDIT GROUPS
+#  TESTS THAT ADMIN CAN EDIT GROUPS
 def test_admin_edit_group(client):
     creator = Staff(
         staff_username="creator",
@@ -484,7 +486,7 @@ def test_admin_edit_group(client):
     db.session.add(creator)
     db.session.commit()
 
-    # Logs in a user
+    #  Logs in a user
     staff = Staff(
         staff_username="test_user",
         job_role="Admin",
@@ -494,7 +496,7 @@ def test_admin_edit_group(client):
     db.session.add(staff)
     db.session.commit()
 
-    # Simulates staff session
+    #  Simulates staff session
     staff_id = staff.staff_id
 
     with client.session_transaction() as session:
@@ -514,17 +516,17 @@ def test_admin_edit_group(client):
         f"/update_group/{society.society_id}", data=update_group, follow_redirects=True
     )
     assert response.status_code == 200
-    # Confirm edit
+    #  Confirm edit
 
-    # Check the DB to verify society was edited successfully by ADMIN
+    #  Check the DB to verify society was edited successfully by ADMIN
     updated_society = db.session.get(Societies, society.society_id)
     assert updated_society.name == "edited_group"
     assert updated_society.description == "testing edits"
 
 
-# TESTS THAT PAGE OWNER CAN EDIT GROUPS
+#  TESTS THAT PAGE OWNER CAN EDIT GROUPS
 def test_non_admin_edit_group(client):
-    # Logs in a user
+    #  Logs in a user
     staff = Staff(
         staff_username="test_user",
         job_role="Non Admin",
@@ -534,7 +536,7 @@ def test_non_admin_edit_group(client):
     db.session.add(staff)
     db.session.commit()
 
-    # Simulates staff session
+    #  Simulates staff session
     staff_id = staff.staff_id
 
     with client.session_transaction() as session:
@@ -554,21 +556,21 @@ def test_non_admin_edit_group(client):
         f"/update_group/{society.society_id}", data=update_group, follow_redirects=True
     )
     assert response.status_code == 200
-    # Confirm edit
+    #  Confirm edit
 
-    # Check the DB to verify society was edited successfully by PAGE OWNER
+    #  Check the DB to verify society was edited successfully by PAGE OWNER
     updated_society = db.session.get(Societies, society.society_id)
     assert updated_society.name == "edited_group"
     assert updated_society.description == "testing edits"
 
 
-# TESTING EDIT ACCOUNT #
-# BOTH NON ADMIN AND ADMIN HAVE THE SAME FORMAT SO ONLY TESTING ONE OF THEM #
+#  TESTING EDIT ACCOUNT #
+#  BOTH NON ADMIN AND ADMIN HAVE THE SAME FORMAT SO ONLY TESTING ONE OF THEM #
 
 
-# TESTS THAT PAGE OWNER CAN EDIT GROUPS
+#  TESTS THAT PAGE OWNER CAN EDIT GROUPS
 def test_edit_account(client):
-    # Logs in a user
+    #  Logs in a user
     staff = Staff(
         staff_username="test_user",
         job_role="Non Admin",
@@ -578,7 +580,7 @@ def test_edit_account(client):
     db.session.add(staff)
     db.session.commit()
 
-    # Simulates staff session
+    #  Simulates staff session
     staff_id = staff.staff_id
 
     with client.session_transaction() as session:
@@ -592,27 +594,27 @@ def test_edit_account(client):
         "password": "",
         "confirm_password": "",
     }
-    # Passwords not changing therefore blank
+    #  Passwords not changing therefore blank
 
     response = client.post(
         "/update_account", data=update_account, follow_redirects=True
     )
     assert response.status_code == 200
-    # Confirm edit
+    #  Confirm edit
 
-    # Check the DB to verify account was edited successfully
+    #  Check the DB to verify account was edited successfully
     updated_account = db.session.get(Staff, staff.staff_id)
     assert updated_account.staff_username == "edited_username"
     assert updated_account.staff_email == "edited_email@email.com"
 
 
-# TESTING DELETE ACCOUNT #
-# ONLY NON ADMINS CAN DELETE THEIR ACCOUNT, ADMINS CANNOT #
+#  TESTING DELETE ACCOUNT #
+#  ONLY NON ADMINS CAN DELETE THEIR ACCOUNT, ADMINS CANNOT #
 
 
-# TESTS THAT USER CAN DELETE ACCOUNT
+#  TESTS THAT USER CAN DELETE ACCOUNT
 def test_delete_account(client):
-    # Logs in a user
+    #  Logs in a user
     staff = Staff(
         staff_username="test_user",
         job_role="Non Admin",
@@ -622,7 +624,7 @@ def test_delete_account(client):
     db.session.add(staff)
     db.session.commit()
 
-    # Simulates staff session
+    #  Simulates staff session
     staff_id = staff.staff_id
 
     with client.session_transaction() as session:
@@ -632,19 +634,19 @@ def test_delete_account(client):
 
     response = client.post(f"/staff/{staff.staff_id}/delete", follow_redirects=True)
     assert response.status_code == 200
-    # Confirm edit
+    #  Confirm edit
 
-    # Check the DB to verify account was edited successfully
+    #  Check the DB to verify account was edited successfully
     society = Staff.query.filter_by(staff_id=staff.staff_id).first()
     assert society is None
 
 
-# TESTING CALENDAR AND ADMIN ANNOUNCEMENTS #
+#  TESTING CALENDAR AND ADMIN ANNOUNCEMENTS #
 
 
-# TESTS THAT USERS CAN ENTER DATES THEY ARE AVAILABLE INTO THE CALENDAR
+#  TESTS THAT USERS CAN ENTER DATES THEY ARE AVAILABLE INTO THE CALENDAR
 def test_date_availabilty(client):
-    # Logs in a user
+    #  Logs in a user
     staff = Staff(
         staff_username="test_user",
         job_role="Non Admin",
@@ -654,7 +656,7 @@ def test_date_availabilty(client):
     db.session.add(staff)
     db.session.commit()
 
-    # Simulates staff session
+    #  Simulates staff session
     staff_id = staff.staff_id
 
     with client.session_transaction() as session:
@@ -668,7 +670,7 @@ def test_date_availabilty(client):
     db.session.add(society)
     db.session.commit()
 
-    # Simulate selecting two dates from the calendar from the day the test is run
+    #  Simulate selecting two dates from the calendar from the day the test is run
     today = date.today()
     date_list = [
         (today + timedelta(days=i)).strftime("%a<br />%d-%m") for i in range(2)
@@ -680,16 +682,16 @@ def test_date_availabilty(client):
     )
     assert response.status_code == 200
 
-    # Check the database for correct data added
+    #  Check the database for correct data added
     entries = Date_Availability.query.filter_by(
         staff_id=staff.staff_id, society_id=society.society_id
     ).all()
     assert len(entries) == 2
 
 
-# TESTS THAT ADMINS AND GROUP CREATORS CAN ADD AN ANNOUNCEMENT
+#  TESTS THAT ADMINS AND GROUP CREATORS CAN ADD AN ANNOUNCEMENT
 def test_announcement(client):
-    # Logs in a user
+    #  Logs in a user
     staff = Staff(
         staff_username="test_user",
         job_role="Non Admin",
@@ -699,7 +701,7 @@ def test_announcement(client):
     db.session.add(staff)
     db.session.commit()
 
-    # Simulates staff session
+    #  Simulates staff session
     staff_id = staff.staff_id
 
     with client.session_transaction() as session:
@@ -721,14 +723,14 @@ def test_announcement(client):
         follow_redirects=True,
     )
     assert response.status_code == 200
-    # Confirm addition of announcement
+    #  Confirm addition of announcement
 
-    # Check the DB to verifythe announcement was added to the db
+    #  Check the DB to verifythe announcement was added to the db
     updated_society = db.session.get(Societies, society.society_id)
     assert updated_society.announcement == "This is an announcement"
 
 
-# # Just do a couple of tests
-# # Pics of the tests
-# # testing approach
-# # # Example screenshot
+#  #  Just do a couple of tests
+#  #  Pics of the tests
+#  #  testing approach
+#  #  #  Example screenshot
