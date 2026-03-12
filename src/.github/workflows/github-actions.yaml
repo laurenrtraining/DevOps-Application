@@ -2,7 +2,7 @@ name: Social Societies CI/CD Pipeline
 run-name: CI/CD pipeline functionality for Social Societies Web Application
 on: 
   push:
-    branches: [main, dev]
+    branches: [main, initiate-pipeline]
   pull_request:
     branches: [main]
 
