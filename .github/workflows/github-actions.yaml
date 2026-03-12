@@ -21,7 +21,7 @@ jobs:
       - name: Python init
         uses: actions/setup-python@v5
         with:
-          python-version: "3.9.1"
+          python-version: "3.11"
 
         # Setup Node
       - name: Setup Node
