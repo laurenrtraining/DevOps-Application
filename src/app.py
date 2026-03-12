@@ -196,7 +196,6 @@ def verification():
     session["user_id"] = user.staff_id
     session["staff_username"] = user.staff_username
     session["job_role"] = user.job_role
-    
     session.pop("mfa_user")
 
     return redirect(url_for("index", success="Verification Successful"))

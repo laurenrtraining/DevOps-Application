@@ -3,10 +3,10 @@ import os
 import pytest
 from datetime import date, timedelta
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))) # flake8: noqa: E402
 # Ensures the test file looks in the correct place for app (Pytest, 2025).
 
-from app import app
+from app import app # flake8: noqa: E402
 from database.database import (
     db,
     Staff,
@@ -14,8 +14,8 @@ from database.database import (
     Staff_Societies,
     Date_Availability,
     MfaTokens,
-)
-from utils import hash_password
+) # flake8: noqa: E402
+from utils import hash_password # flake8: noqa: E402
 
 
 @pytest.fixture
