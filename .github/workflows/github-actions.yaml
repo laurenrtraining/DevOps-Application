@@ -48,19 +48,19 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install -r requirements.txt
+          pip install -r src/requirements.txt
         
         # Run pytest
       - name: Test with Pytest
         run: |
           pip install pytest pytest-cov
-          pytest tests/
+          pytest src/tests/
 
-       # Deploy on Render
-      - name: Test with Pytest
-        run: |
-          pip install pytest pytest-cov
-          pytest tests/
+      #  # Deploy on Render
+      # - name: Test with Pytest
+      #   run: |
+      #     pip install pytest pytest-cov
+      #     pytest tests/
         
 
       
