@@ -7,7 +7,14 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 # Ensures the test file looks in the correct place for app (Pytest, 2025).
 
 from app import app
-from database.database import db, Staff, Societies, Staff_Societies, Date_Availability, MfaTokens
+from database.database import (
+    db,
+    Staff,
+    Societies,
+    Staff_Societies,
+    Date_Availability,
+    MfaTokens,
+)
 from utils import hash_password
 
 
@@ -16,7 +23,9 @@ from utils import hash_password
 def client():
     app.config["TESTING"] = True
     app.config["WTF_CSRF_ENABLED"] = False
-    app.config["MAIL_SUPPRESS_SEND"] = True # prevents real emails being sent to fake accounts
+    app.config["MAIL_SUPPRESS_SEND"] = (
+        True  # prevents real emails being sent to fake accounts
+    )
     # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://:memory:' # (SQLite, 2022)
 
     # Initialising client (Flask, 2024)
@@ -46,6 +55,7 @@ def test_render_index_when_logged_out(client):
 
 # TESTS THAT MFA FEATURE WORKS WHEN CORRECT CODE IS ENTERED
 # USERS CAN SIGN IN AS NON ADMIN AND ADMIN SUCCESSFULLY AND THAT THE DB SEARCH WORKS
+
 
 def test_sign_in_mfa_email_verification_correct(client):
     staff = Staff(
@@ -83,6 +93,7 @@ def test_sign_in_mfa_email_verification_correct(client):
 
 
 # TESTS THAT WHEN WRONG CODE IN ENTERED MFA VALIDATION FAILS
+
 
 def test_mfa_email_verification_incorrect(client):
     staff = Staff(
