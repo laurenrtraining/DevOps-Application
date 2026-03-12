@@ -40,7 +40,7 @@ def client():
         # After running the tests, they are deleted from the database
 
 
-### MAIN TESTS ###
+# MAIN TESTS #
 
 
 # RENDER INDEX PAGE ON STARTUP
@@ -51,7 +51,7 @@ def test_render_index_when_logged_out(client):
     assert b"Guest" in response.data
 
 
-### SIGN IN ###
+# SIGN IN #
 
 # TESTS THAT MFA FEATURE WORKS WHEN CORRECT CODE IS ENTERED
 # USERS CAN SIGN IN AS NON ADMIN AND ADMIN SUCCESSFULLY AND THAT THE DB SEARCH WORKS
@@ -154,7 +154,7 @@ def test_user_sign_in_fail(client):
     assert b"Invalid username or password" in response.data
 
 
-### REGISTRATION ###
+# REGISTRATION #
 
 
 # TESTS THAT USER REGISTRATION SEARCHED DB BEFORE ALLOWING CREATION - ACCOUNT ALREADY EXISTS
@@ -240,7 +240,7 @@ def test_user_registration_not_preexisting(client):
     assert b"Sign Out" in response.data
 
 
-### CREATE SOCIETIES ###
+# CREATE SOCIETIES #
 
 
 # TESTS THAT USERS CAN CREATE NEW GROUPS
@@ -285,7 +285,7 @@ def test_create_groups(client):
     # Creates new group successfully
 
 
-### JOIN, LEAVE AND DELETE SOCIETIES ###
+# JOIN, LEAVE AND DELETE SOCIETIES #
 
 
 # TESTS THAT USERS CAN JOIN GROUPS
@@ -470,7 +470,7 @@ def test_delete_group_non_admin(client):
     assert society is None
 
 
-### TESTS TO EDIT GROUP DETAILS ###
+# TESTS TO EDIT GROUP DETAILS #
 
 
 # TESTS THAT ADMIN CAN EDIT GROUPS
@@ -562,8 +562,8 @@ def test_non_admin_edit_group(client):
     assert updated_society.description == "testing edits"
 
 
-### TESTING EDIT ACCOUNT ###
-# BOTH NON ADMIN AND ADMIN HAVE THE SAME FORMAT SO ONLY TESTING ONE OF THEM ###
+# TESTING EDIT ACCOUNT #
+# BOTH NON ADMIN AND ADMIN HAVE THE SAME FORMAT SO ONLY TESTING ONE OF THEM #
 
 
 # TESTS THAT PAGE OWNER CAN EDIT GROUPS
@@ -606,8 +606,8 @@ def test_edit_account(client):
     assert updated_account.staff_email == "edited_email@email.com"
 
 
-### TESTING DELETE ACCOUNT ###
-### ONLY NON ADMINS CAN DELETE THEIR ACCOUNT, ADMINS CANNOT ###
+# TESTING DELETE ACCOUNT #
+# ONLY NON ADMINS CAN DELETE THEIR ACCOUNT, ADMINS CANNOT #
 
 
 # TESTS THAT USER CAN DELETE ACCOUNT
@@ -639,7 +639,7 @@ def test_delete_account(client):
     assert society is None
 
 
-### TESTING CALENDAR AND ADMIN ANNOUNCEMENTS ###
+# TESTING CALENDAR AND ADMIN ANNOUNCEMENTS #
 
 
 # TESTS THAT USERS CAN ENTER DATES THEY ARE AVAILABLE INTO THE CALENDAR

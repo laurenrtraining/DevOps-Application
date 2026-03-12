@@ -57,9 +57,9 @@ def generate_mfa_token():
     return str(random.randint(100000, 999999))
 
 
-### App.routes for rendering all pages ###
+# App.routes for rendering all pages #
 
-### REGISTRSTION AND SIGN IN ###
+# REGISTRSTION AND SIGN IN #
 
 
 # Render homepage
@@ -240,7 +240,7 @@ def logout():
     # Back to homepage
 
 
-### RENDERING ACCOUNT PAGE AND SETTINGS ###
+# RENDERING ACCOUNT PAGE AND SETTINGS #
 
 
 @app.route("/my_account")
@@ -265,7 +265,7 @@ def my_account():
     # Account page is rendered
 
 
-### EDITING ACCOUNTS IN THE DATABASE ###
+# EDITING ACCOUNTS IN THE DATABASE #
 
 
 @app.route("/update_account", methods=["GET", "POST"])
@@ -311,7 +311,7 @@ def update_account():
     )
 
 
-### EDITING GROUPS IN THE DATABASE ###
+# EDITING GROUPS IN THE DATABASE #
 
 
 @app.route("/update_group/<int:group_id>", methods=["GET", "POST"])
@@ -354,7 +354,7 @@ def update_group(group_id):
     )
 
 
-### DELETE USER ACCOUNT ###
+# DELETE USER ACCOUNT #
 
 
 @app.route("/staff/<int:staff_id>/delete", methods=["POST"])
@@ -375,7 +375,7 @@ def delete_account(staff_id):
     return redirect(url_for("index"))  # Return to homepage
 
 
-### RENDERING NAVBAR LINKS ###
+# RENDERING NAVBAR LINKS #
 
 
 @app.route("/about")
@@ -412,7 +412,7 @@ def my_groups():
     # Calls all existing societies that the user logged in is a member of and displays them
 
 
-### CREATING NEW GROUPS/SOCIETIES ###
+# CREATING NEW GROUPS/SOCIETIES #
 
 
 # Creation of new groups
@@ -461,7 +461,7 @@ def submit_group():
     # Return to homepage
 
 
-### CODE BASE FOR ALL NEW SOCIETIES THAT ARE MADE - MADE GENERIC FOR ALL SOCIETIES ###
+# CODE BASE FOR ALL NEW SOCIETIES THAT ARE MADE - MADE GENERIC FOR ALL SOCIETIES #
 
 
 @app.route("/group/<int:group_id>", methods=["GET", "POST"])
@@ -575,7 +575,7 @@ def group_detail(group_id):
     # Everything that needs rendering for this page to work
 
 
-### DELETING GROUPS FROM THE DATABASE ###
+# DELETING GROUPS FROM THE DATABASE #
 
 
 @app.route("/group/<int:group_id>/delete", methods=["POST"])
@@ -604,7 +604,7 @@ def delete_group(group_id):
     return redirect(url_for("index"))  # Return to homepage
 
 
-### ADDING AN ANNOUNCEMENT TO GROUP PAGE AND DATABASE ###
+# ADDING AN ANNOUNCEMENT TO GROUP PAGE AND DATABASE #
 
 
 @app.route("/group/<int:group_id>/announcement", methods=["POST"])
@@ -646,7 +646,7 @@ def announcement(group_id):
 # Adds to database and then renders on the page by calling from the database
 
 
-### JOIN AND LEAVE GROUPS ###
+# JOIN AND LEAVE GROUPS #
 
 
 # Join Group
