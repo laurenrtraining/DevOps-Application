@@ -15,7 +15,7 @@ from datetime import date, timedelta, datetime
 import time
 from collections import defaultdict
 from utils import hash_password, init_mail, send_email
-import random
+import secrets
 
 instance_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "instance")
@@ -54,7 +54,7 @@ app.secret_key = os.urandom(24)
 
 
 def generate_mfa_token():
-    return str(random.randint(100000, 999999))
+    return str(secrets.randbelow(900000) + 100000)
 
 
 # App.routes for rendering all pages #
