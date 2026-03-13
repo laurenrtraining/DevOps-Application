@@ -20,16 +20,17 @@ from database.database import (
 )
 from utils import hash_password
 
+
 @pytest.fixture
 #  Client function simulates the database and prevents tests against real data
 def client():
-    db_fd, db_path = tempfile.mkstemp() # Creates a temporary file
+    db_fd, db_path = tempfile.mkstemp()  # Creates a temporary file
     app.config["TESTING"] = True
     app.config["WTF_CSRF_ENABLED"] = False
     app.config["MAIL_SUPPRESS_SEND"] = (
         True  #  prevents real emails being sent to fake accounts
     )
-    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}" #  (SQLite, 2022)
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"  #  (SQLite, 2022)
 
     #  Initialising client (Flask, 2024)
     with app.app_context():
@@ -42,8 +43,9 @@ def client():
         db.drop_all()
         #  After running the tests, they are deleted from the database
 
-    os.close(db_fd) # pointer to file
-    os.unlink(db_path) # path to file - deletes the temp file after tests are complete
+    os.close(db_fd)  # pointer to file
+    os.unlink(db_path)  # path to file - deletes the temp file after tests are complete
+
 
 #  MAIN TESTS #
 

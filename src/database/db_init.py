@@ -9,7 +9,7 @@ from utils import hash_password
 
 app = Flask(__name__, instance_relative_config=True)
 
-db_path = "/tmp/FLASK_DATABASE.db"
+db_path = os.path.join("/tmp", "FLASK_DATABASE.db")
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
 # Specified file location outside of src
