@@ -1,7 +1,6 @@
 # Imports
 from flask import Flask, render_template, request, redirect, url_for, session, abort
 import os
-from database.db_init import create_and_initialise_db
 from database.database import (
     db,
     Staff,
@@ -705,6 +704,19 @@ def leave_group(group_id):
 # RUNS THE APPLICATION AND CHECKS DATABASE EXISTENCE #
 if __name__ == "__main__":
     with app.app_context():
-        create_and_initialise_db()
+        import os
+
+        db_url = os.environ.get("DATABASE_URL")
+        if db_url:
+            app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+        else:
+            app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
+                app.instance_path, "FLASK_DATABASE.db"
+            )
+
         db.create_all()
+        if not Staff.query.first():
+            from database.db_init import create_and_initialise_db
+
+            create_and_initialise_db()
     app.run()
