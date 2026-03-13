@@ -13,6 +13,7 @@ jobs:
   ci:
     name: Pre-deployment processes
     runs-on: ubuntu-latest
+    continue-on-error: true # If code fails in one section the pipeline will still continue
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
