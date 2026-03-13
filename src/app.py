@@ -1,7 +1,6 @@
 # Imports
 from flask import Flask, render_template, request, redirect, url_for, session, abort
 import os
-from database.db_init import create_and_initialise_db
 from database.database import (
     db,
     Staff,
