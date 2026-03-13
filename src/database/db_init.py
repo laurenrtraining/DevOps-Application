@@ -258,7 +258,7 @@ def create_and_initialise_db():
             "announcement": None,
         },
         {
-            "society_id": 10,
+            "society_id": 11,
             "name": "Badminton",
             "description": "Casual and competitive badminton matches weekly.",
             "created_by": 2,
