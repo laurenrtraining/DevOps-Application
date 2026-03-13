@@ -20,7 +20,6 @@ from database.database import (
 )
 from utils import hash_password
 
-
 @pytest.fixture
 #  Client function simulates the database and prevents tests against real data
 def client():

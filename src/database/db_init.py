@@ -15,7 +15,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 # Specified file location outside of src
 # Ensures database instance is created in the correct location
 
-# Initialize db
+# Initialise db
 db.init_app(app)
 
 
