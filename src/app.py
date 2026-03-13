@@ -31,6 +31,9 @@ app = Flask(
 )
 # All HTML files are stored in 'templates', images are stored in 'static'
 
+# Ensure instance folder exists
+os.makedirs(app.instance_path, exist_ok=True)
+
 # Ensures any uploaded images can be accessed when creating new groups
 UPLOAD_FOLDER = "static/group_images"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -701,7 +704,6 @@ def leave_group(group_id):
 
 # RUNS THE APPLICATION AND CHECKS DATABASE EXISTENCE #
 if __name__ == "__main__":
-    os.makedirs(app.instance_path, exist_ok=True)
     with app.app_context():
         create_and_initialise_db()
         db.create_all()
