@@ -1,14 +1,21 @@
 # Imports
 from flask import Flask, render_template, request, redirect, url_for, session, abort
 import os
-from database.db_init import app, create_and_initialise_db
-from database.database import db, Staff, Societies, Staff_Societies, Date_Availability, MfaTokens
+from database.db_init import create_and_initialise_db
+from database.database import (
+    db,
+    Staff,
+    Societies,
+    Staff_Societies,
+    Date_Availability,
+    MfaTokens,
+)
 from werkzeug.utils import secure_filename
-from datetime import date, time, timedelta, datetime
+from datetime import date, timedelta, datetime
 import time
 from collections import defaultdict
 from utils import hash_password, init_mail, send_email
-import random
+import secrets
 
 instance_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "instance")
@@ -45,11 +52,15 @@ app.secret_key = os.urandom(24)
 # Creating a secret key to run login sessions
 # Random creation for added security
 
-def generate_mfa_token():
-    return str(random.randint(100000, 999999))
-### App.routes for rendering all pages ###
 
-### REGISTRSTION AND SIGN IN ###
+def generate_mfa_token():
+    return str(secrets.randbelow(900000) + 100000)
+
+
+# App.routes for rendering all pages #
+
+# REGISTRSTION AND SIGN IN #
+
 
 # Render homepage
 @app.route("/")
@@ -61,6 +72,7 @@ def index():
     return render_template(
         "index.html", groups=groups, job_role=job_role, success=success
     )
+
 
 # Shows 'create group' if users are signed in and displays all groups in existence
 
@@ -74,16 +86,16 @@ def sign_in():
 
         user = Staff.query.filter_by(staff_username=username).first()
         # Checks that the user exists in the database
-        
+
         hashed_password = hash_password(password)
 
         if user and user.password == hashed_password:
             code = generate_mfa_token()
             token = MfaTokens(
                 token=code,
-                staff_email = user.staff_email,
-                created_at = int(datetime.now().timestamp()),
-                expires_at = int(datetime.now().timestamp()) + 300, # 5 min timeout
+                staff_email=user.staff_email,
+                created_at=int(datetime.now().timestamp()),
+                expires_at=int(datetime.now().timestamp()) + 300,  # 5 min timeout
             )
 
             db.session.add(token)
@@ -93,7 +105,7 @@ def sign_in():
             send_email(user.staff_email, code)
             return redirect(url_for("mfa_verify"))
             # these call route through the name of the funtion, not the html route - makes the code tidier
-        
+
             # If username or password is incorrect or doesn't exist it throws an error
         else:
             return render_template("sign_in.html", error="Invalid username or password")
@@ -139,9 +151,9 @@ def registration():
         code = generate_mfa_token()
         token = MfaTokens(
             token=code,
-            staff_email = user.staff_email,
-            created_at = int(datetime.now().timestamp()),
-            expires_at = int(datetime.now().timestamp()) + 300, # 5 min timeout
+            staff_email=user.staff_email,
+            created_at=int(datetime.now().timestamp()),
+            expires_at=int(datetime.now().timestamp()) + 300,  # 5 min timeout
         )
 
         db.session.add(token)
@@ -154,11 +166,12 @@ def registration():
 
     return render_template("register.html")
 
+
 @app.route("/verify", methods=["POST"])
 def verification():
     if "mfa_user" not in session:
         return redirect(url_for("sign_in"))
-    
+
     code = request.form.get("token")
     user_id = session["mfa_user"]
     user = db.session.get(Staff, user_id)
@@ -175,13 +188,18 @@ def verification():
             "mfa_verify.html",
             error="Token Expired",
         )
-    
+
     MfaTokens.query.filter_by(token=code).delete()
     db.session.commit()
+
+    # Logged in session variables
+    session["user_id"] = user.staff_id
+    session["staff_username"] = user.staff_username
+    session["job_role"] = user.job_role
     session.pop("mfa_user")
 
     return redirect(url_for("index", success="Verification Successful"))
-    
+
 
 @app.route("/mfa")
 def mfa_verify():
@@ -189,11 +207,12 @@ def mfa_verify():
         return redirect(url_for("sign_in"))
     return render_template("mfa_verify.html")
 
+
 @app.route("/resend-code")
 def resend_code():
     if "mfa_user" not in session:
         return redirect(url_for("sign_in"))
-    
+
     user_id = session["mfa_user"]
     user = db.session.get(Staff, user_id)
 
@@ -203,9 +222,9 @@ def resend_code():
     code = generate_mfa_token()
     token = MfaTokens(
         token=code,
-        staff_email = user.staff_email,
-        created_at = int(datetime.now().timestamp()),
-        expires_at = int(datetime.now().timestamp()) + 300, # 5 min timeout
+        staff_email=user.staff_email,
+        created_at=int(datetime.now().timestamp()),
+        expires_at=int(datetime.now().timestamp()) + 300,  # 5 min timeout
     )
 
     db.session.add(token)
@@ -213,7 +232,10 @@ def resend_code():
     session["mfa_user"] = user.staff_id
     print("NEW MFA CODE:", code)
     send_email(user.staff_email, code)
-    return render_template("mfa_verify.html", success="A new verification email has been sent")
+    return render_template(
+        "mfa_verify.html", success="A new verification email has been sent"
+    )
+
 
 @app.route("/logout")
 def logout():
@@ -223,7 +245,7 @@ def logout():
     # Back to homepage
 
 
-### RENDERING ACCOUNT PAGE AND SETTINGS ###
+# RENDERING ACCOUNT PAGE AND SETTINGS #
 
 
 @app.route("/my_account")
@@ -248,7 +270,7 @@ def my_account():
     # Account page is rendered
 
 
-### EDITING ACCOUNTS IN THE DATABASE ###
+# EDITING ACCOUNTS IN THE DATABASE #
 
 
 @app.route("/update_account", methods=["GET", "POST"])
@@ -273,7 +295,7 @@ def update_account():
                     staff_email=user.staff_email,
                     error="Passwords do not match.",
                 )
-            
+
             hashed_password = hash_password(password)
             user.password = hashed_password
 
@@ -294,7 +316,7 @@ def update_account():
     )
 
 
-### EDITING GROUPS IN THE DATABASE ###
+# EDITING GROUPS IN THE DATABASE #
 
 
 @app.route("/update_group/<int:group_id>", methods=["GET", "POST"])
@@ -337,7 +359,7 @@ def update_group(group_id):
     )
 
 
-### DELETE USER ACCOUNT ###
+# DELETE USER ACCOUNT #
 
 
 @app.route("/staff/<int:staff_id>/delete", methods=["POST"])
@@ -358,7 +380,7 @@ def delete_account(staff_id):
     return redirect(url_for("index"))  # Return to homepage
 
 
-### RENDERING NAVBAR LINKS ###
+# RENDERING NAVBAR LINKS #
 
 
 @app.route("/about")
@@ -395,7 +417,7 @@ def my_groups():
     # Calls all existing societies that the user logged in is a member of and displays them
 
 
-### CREATING NEW GROUPS/SOCIETIES ###
+# CREATING NEW GROUPS/SOCIETIES #
 
 
 # Creation of new groups
@@ -444,7 +466,7 @@ def submit_group():
     # Return to homepage
 
 
-### CODE BASE FOR ALL NEW SOCIETIES THAT ARE MADE - MADE GENERIC FOR ALL SOCIETIES ###
+# CODE BASE FOR ALL NEW SOCIETIES THAT ARE MADE - MADE GENERIC FOR ALL SOCIETIES #
 
 
 @app.route("/group/<int:group_id>", methods=["GET", "POST"])
@@ -558,7 +580,7 @@ def group_detail(group_id):
     # Everything that needs rendering for this page to work
 
 
-### DELETING GROUPS FROM THE DATABASE ###
+# DELETING GROUPS FROM THE DATABASE #
 
 
 @app.route("/group/<int:group_id>/delete", methods=["POST"])
@@ -587,7 +609,7 @@ def delete_group(group_id):
     return redirect(url_for("index"))  # Return to homepage
 
 
-### ADDING AN ANNOUNCEMENT TO GROUP PAGE AND DATABASE ###
+# ADDING AN ANNOUNCEMENT TO GROUP PAGE AND DATABASE #
 
 
 @app.route("/group/<int:group_id>/announcement", methods=["POST"])
@@ -603,7 +625,7 @@ def announcement(group_id):
         abort(404)
 
     if not can_delete:
-        abort(403) 
+        abort(403)
 
     new_announcement = request.form.get("announcement", "").strip()
     # Sets new announcement
@@ -629,7 +651,7 @@ def announcement(group_id):
 # Adds to database and then renders on the page by calling from the database
 
 
-### JOIN AND LEAVE GROUPS ###
+# JOIN AND LEAVE GROUPS #
 
 
 # Join Group
@@ -683,4 +705,4 @@ if __name__ == "__main__":
     with app.app_context():
         create_and_initialise_db()
         db.create_all()
-    app.run(debug=True)
+    app.run()
