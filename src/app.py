@@ -80,7 +80,7 @@ def index():
 
 
 # Render sign in page
-@app.route("/sign_in.html", methods=["GET", "POST"])
+@app.route("/sign_in", methods=["GET", "POST"])
 def sign_in():
     if request.method == "POST":
         username = request.form.get("staff_username")
@@ -116,7 +116,7 @@ def sign_in():
 
 
 # Render regsistration page
-@app.route("/register.html", methods=["GET", "POST"])
+@app.route("/register", methods=["GET", "POST"])
 def registration():
     if request.method == "POST":
         username = request.form.get("staff_username")
