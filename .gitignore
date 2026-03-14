@@ -6,7 +6,10 @@ __pycache__/
 my-venv/
 
 # Ignore DB and instance folders
-# instance/FLASK_DATABASE.db
+instance/FLASK_DATABASE.db
+
+# Ignore SQLMap implementation files
+sqlmap-dev/
 
 # Ignore VS Code settings (optional)
 .vscode/
