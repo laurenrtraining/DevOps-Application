@@ -75,7 +75,7 @@ def test_sign_in_mfa_email_verification_correct(client):
     db.session.commit()
 
     response = client.post(
-        "/sign_in.html",
+        "/sign_in",
         data={"staff_username": "test_user", "password": "testUser123"},
         follow_redirects=True,
     )
@@ -113,7 +113,7 @@ def test_mfa_email_verification_incorrect(client):
     db.session.commit()
 
     response = client.post(
-        "/sign_in.html",
+        "/sign_in",
         data={"staff_username": "test_user", "password": "testUser123"},
         follow_redirects=True,
     )
@@ -139,7 +139,7 @@ def test_mfa_email_verification_incorrect(client):
 #  TESTS THAT VALIDATION WORKS BY INPUTTING INCORRECT PASSWORD
 def test_user_sign_in_fail(client):
     #  Gets to the sign in page first
-    response = client.get("/sign_in.html")
+    response = client.get("/sign_in")
     assert response.status_code == 200
 
     staff = Staff(
@@ -152,7 +152,7 @@ def test_user_sign_in_fail(client):
     db.session.commit()
 
     response = client.post(
-        "/sign_in.html",
+        "/sign_in",
         data={"staff_username": "test_user", "password": "wrongPassword123"},
         follow_redirects=True,
     )
@@ -167,7 +167,7 @@ def test_user_sign_in_fail(client):
 #  TESTS THAT USER REGISTRATION SEARCHED DB BEFORE ALLOWING CREATION - ACCOUNT ALREADY EXISTS
 def test_user_registration_if_existing(client):
     #  Gets to the sign in page first
-    response = client.get("/sign_in.html")
+    response = client.get("/sign_in")
     assert response.status_code == 200
 
     staff = Staff(
@@ -183,12 +183,12 @@ def test_user_registration_if_existing(client):
     assert b"Register" in response.data
 
     #  Simulates clicking registration button
-    response = client.get("/register.html")
+    response = client.get("/register")
     assert response.status_code == 200
     assert b"Registration Form" in response.data
 
     response = client.post(
-        "/register.html",
+        "/register",
         data={
             "staff_username": "test_user1",
             "job_role": "Non Admin",
@@ -206,19 +206,19 @@ def test_user_registration_if_existing(client):
 #  TESTS THAT USER REGISTRATION SUCCESSFULLY ADDS TO DB
 def test_user_registration_not_preexisting(client):
     #  Gets to the sign in page first
-    response = client.get("/sign_in.html")
+    response = client.get("/sign_in")
     assert response.status_code == 200
 
     #  Confirm registration option is on the page
     assert b"Register" in response.data
 
     #  Simulates clicking registration button
-    response = client.get("/register.html")
+    response = client.get("/register")
     assert response.status_code == 200
     assert b"Registration Form" in response.data
 
     response = client.post(
-        "/register.html",
+        "/register",
         data={
             "staff_username": "test_user1",
             "job_role": "Non Admin",
@@ -263,7 +263,7 @@ def test_create_groups(client):
     db.session.commit()
 
     response = client.post(
-        "/sign_in.html",
+        "/sign_in",
         data={"staff_username": "test_user", "password": "testUser123"},
         follow_redirects=True,
     )
