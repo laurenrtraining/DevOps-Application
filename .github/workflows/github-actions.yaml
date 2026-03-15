@@ -34,7 +34,7 @@ jobs:
         continue-on-error: true # If code fails in one section the pipeline will still continue
         run: |
           npm install --save-dev prettier
-          npx prettier --check .          
+          npx prettier --check .
 
         # Run linting for python
       - name: Run linting for python

@@ -702,14 +702,14 @@ def leave_group(group_id):
 
 
 # RUNS THE APPLICATION AND CHECKS DATABASE EXISTENCE #
+with app.app_context():
+    db_path = os.path.join("/tmp", "FLASK_DATABASE.db")
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+
+    db.create_all()
+    if not Staff.query.first():
+        from database.db_init import create_and_initialise_db
+        create_and_initialise_db()
+
 if __name__ == "__main__":
-    with app.app_context():
-        db_path = os.path.join("/tmp", "FLASK_DATABASE.db")
-        app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
-
-        db.create_all()
-        if not Staff.query.first():
-            from database.db_init import create_and_initialise_db
-
-            create_and_initialise_db()
     app.run()
