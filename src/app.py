@@ -704,15 +704,8 @@ def leave_group(group_id):
 # RUNS THE APPLICATION AND CHECKS DATABASE EXISTENCE #
 if __name__ == "__main__":
     with app.app_context():
-        import os
-
-        db_url = os.environ.get("DATABASE_URL")
-        if db_url:
-            app.config["SQLALCHEMY_DATABASE_URI"] = db_url
-        else:
-            app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
-                app.instance_path, "FLASK_DATABASE.db"
-            )
+        db_path = os.path.join("/tmp", "FLASK_DATABASE.db")
+        app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
         db.create_all()
         if not Staff.query.first():
