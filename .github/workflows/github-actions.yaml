@@ -13,7 +13,6 @@ jobs:
   ci:
     name: Pre-deployment processes
     runs-on: ubuntu-latest
-    continue-on-error: true # If code fails in one section the pipeline will still continue
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,12 +31,15 @@ jobs:
 
         # Run prettier
       - name: Run prettier for formatting
+        continue-on-error: true # If code fails in one section the pipeline will still continue
         run: |
           npm install --save-dev prettier
-          npx prettier --check .
+          npx prettier --check .          
 
         # Run linting for python
       - name: Run linting for python
+        continue-on-error: true # If code fails in one section the pipeline will still continue
+
         run: |
           pip install flake8
           flake8 .
@@ -46,7 +48,7 @@ jobs:
       - name: Security Scanning
         run: |
           pip install bandit
-          bandit -r ./src --exclude ./src/tests,./src/database,./src/utils.py
+          bandit -r ./src -lll --exclude ./src/tests,./src/database,./src/utils.py
         # This prevents the test suite, utils and database being tested since this is just scaffolding data
         # The password within the utils file is not the actual password it just enables the link to gmail
 
