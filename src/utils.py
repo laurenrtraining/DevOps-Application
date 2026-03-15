@@ -1,5 +1,6 @@
 import hashlib
 from flask_mail import Mail, Message
+import os
 
 salt = "5gz"
 
@@ -13,7 +14,7 @@ mail = Mail()
 
 
 def init_mail(app):
-    app.config["MAIL_SERVER"] = "smtp-relay.gmail.com"
+    app.config["MAIL_SERVER"] = "smtp.gmail.com"
     app.config["MAIL_PORT"] = 587
     app.config["MAIL_USE_SSL"] = False
     app.config["MAIL_USE_TLS"] = True
@@ -27,14 +28,18 @@ def init_mail(app):
 
 
 def send_email(to_email, code):
-    if mail is None:
-        raise RuntimeError(
-            "Mail not working. Contact Administrator. Initialise App first"
-        )
+    if os.environ.get("RENDER") == "true":
+        print(f"Email to {to_email}: Your code is: {code} \n It expires in 5 minutes")
+        return
+    else:
+        if mail is None:
+            raise RuntimeError(
+                "Mail not working. Contact Administrator. Initialise App first"
+            )
 
-    message = Message(
-        subject="Your MFA Verification Code",
-        recipients=[to_email],
-        body=f"Your code is: {code} \n It expires in 5 minutes",
-    )
-    mail.send(message)
+        message = Message(
+            subject="Your MFA Verification Code",
+            recipients=[to_email],
+            body=f"Your code is: {code} \n It expires in 5 minutes",
+        )
+        mail.send(message)
