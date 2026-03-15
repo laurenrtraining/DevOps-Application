@@ -16,10 +16,11 @@ def init_mail(app):
     app.config["MAIL_SERVER"] = "smtp.gmail.com"
     app.config["MAIL_PORT"] = 465
     app.config["MAIL_USE_SSL"] = True
+    app.config["MAIL_USE_TLS"] = False
     app.config["MAIL_USERNAME"] = "socialsocieties10@gmail.com"
     app.config["MAIL_PASSWORD"] = "cegc blba etoj ozwx"
     app.config["MAIL_DEFAULT_SENDER"] = (
-        "SocialSocieties <noreply@socialsocieties.co.uk>"
+        "SocialSocieties <socialsocieties10@gmail.com>"
     )
 
     mail.init_app(app)
