@@ -1,5 +1,5 @@
 # Imports
-from flask import Flask, render_template, request, redirect, url_for, session, abort
+from flask import Flask, render_template, request, redirect, url_for, session, abort, jsonify
 import os
 from database.database import (
     db,
@@ -103,9 +103,15 @@ def sign_in():
             db.session.add(token)
             db.session.commit()
             session["mfa_user"] = user.staff_id
+
+            redirect_url = url_for("mfa_verify")
+
+            if os.environ.get("RENDER") == "true":
+                return jsonify({"redirect": redirect_url, "mfa_code": code})
+            
             print("MFA CODE:", code)
             send_email(user.staff_email, code)
-            return redirect(url_for("mfa_verify"))
+            return redirect(redirect_url)
             # these call route through the name of the funtion, not the html route - makes the code tidier
 
             # If username or password is incorrect or doesn't exist it throws an error
