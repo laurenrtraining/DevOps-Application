@@ -1,6 +1,5 @@
 import hashlib
 from flask_mail import Mail, Message
-import os
 
 salt = "5gz"
 
