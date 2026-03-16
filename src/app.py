@@ -1,5 +1,16 @@
 # Imports
-from flask import Flask, render_template, request, redirect, url_for, session, abort, jsonify
+import code
+
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    session,
+    abort,
+    jsonify,
+)
 import os
 from database.database import (
     db,
@@ -103,13 +114,13 @@ def sign_in():
             db.session.add(token)
             db.session.commit()
             session["mfa_user"] = user.staff_id
+            session["mfa_code"] = code
 
             redirect_url = url_for("mfa_verify")
 
             if os.environ.get("RENDER") == "true":
                 return jsonify({"redirect": redirect_url, "mfa_code": code})
-            
-            print("MFA CODE:", code)
+
             send_email(user.staff_email, code)
             return redirect(redirect_url)
             # these call route through the name of the funtion, not the html route - makes the code tidier
@@ -167,7 +178,7 @@ def registration():
         db.session.add(token)
         db.session.commit()
         session["mfa_user"] = user.staff_id
-        print("MFA CODE:", code)
+        session["mfa_code"] = code
         send_email(user.staff_email, code)
         return redirect(url_for("mfa_verify"))
         # Logs the user in successfully
@@ -213,7 +224,10 @@ def verification():
 def mfa_verify():
     if "mfa_user" not in session:
         return redirect(url_for("sign_in"))
-    return render_template("mfa_verify.html")
+
+    code = session.get("mfa_code")
+    success_message = f"MFA Token: {code}"
+    return render_template("mfa_verify.html", success=success_message)
 
 
 @app.route("/resend-code")
@@ -238,11 +252,10 @@ def resend_code():
     db.session.add(token)
     db.session.commit()
     session["mfa_user"] = user.staff_id
-    print("NEW MFA CODE:", code)
+    session["mfa_code"] = code
+    success_message = f"Email Resent. New MFA Token: {code}"
     send_email(user.staff_email, code)
-    return render_template(
-        "mfa_verify.html", success="A new verification email has been sent"
-    )
+    return render_template("mfa_verify.html", success=success_message)
 
 
 @app.route("/logout")
@@ -715,6 +728,7 @@ with app.app_context():
     db.create_all()
     if not Staff.query.first():
         from database.db_init import create_and_initialise_db
+
         create_and_initialise_db()
 
 if __name__ == "__main__":

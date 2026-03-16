@@ -1,4 +1,4 @@
-# flask_app
+# DevOps Application
 
 GitHub Repository: https://github.com/laurenrtraining/DevOps-Application
 

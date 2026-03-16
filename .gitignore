@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 
 # Ignore virtual environments
-my-venv/
+my-venv
 
 # Ignore DB and instance folders
 instance/FLASK_DATABASE.db
@@ -17,3 +17,4 @@ sqlmap-dev/
 # Ignore compiled files
 *.log
 instance/FLASK_DATABASE.db
+
