@@ -5,6 +5,7 @@ import tempfile
 import os
 import pytest
 from datetime import date, timedelta
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 #   Ensures the test file looks in the correct place for app (Pytest, 2025).
@@ -47,6 +48,13 @@ def client():
     os.unlink(db_path)  # path to file - deletes the temp file after tests are complete
 
 
+# MOCK EMAIL SEND #
+@pytest.fixture
+def mock_mail_send():
+    with patch("utils.mail.send") as mock_send:
+        yield mock_send
+
+
 #  MAIN TESTS #
 
 
@@ -64,7 +72,7 @@ def test_render_index_when_logged_out(client):
 #  USERS CAN SIGN IN AS NON ADMIN AND ADMIN SUCCESSFULLY AND THAT THE DB SEARCH WORKS
 
 
-def test_sign_in_mfa_email_verification_correct(client):
+def test_sign_in_mfa_email_verification_correct(client, mock_mail_send):
     staff = Staff(
         staff_username="test_user",
         job_role="Non Admin",
@@ -80,6 +88,7 @@ def test_sign_in_mfa_email_verification_correct(client):
         follow_redirects=True,
     )
 
+    mock_mail_send.assert_called_once()  #  Check that the email sending function was called
     assert response.status_code == 200
     #  This checks to see if the verification page has been reached with correct details
 
@@ -102,7 +111,7 @@ def test_sign_in_mfa_email_verification_correct(client):
 #  TESTS THAT WHEN WRONG CODE IN ENTERED MFA VALIDATION FAILS
 
 
-def test_mfa_email_verification_incorrect(client):
+def test_mfa_email_verification_incorrect(client, mock_mail_send):
     staff = Staff(
         staff_username="test_user",
         job_role="Non Admin",
@@ -204,7 +213,7 @@ def test_user_registration_if_existing(client):
 
 
 #  TESTS THAT USER REGISTRATION SUCCESSFULLY ADDS TO DB
-def test_user_registration_not_preexisting(client):
+def test_user_registration_not_preexisting(client, mock_mail_send):
     #  Gets to the sign in page first
     response = client.get("/sign_in")
     assert response.status_code == 200
@@ -228,6 +237,7 @@ def test_user_registration_not_preexisting(client):
         follow_redirects=True,
     )
 
+    mock_mail_send.assert_called_once()  #  Check that the email sending function was called
     assert response.status_code == 200
     #  This checks to see if the verification page has been reached with correct details
 
@@ -251,7 +261,7 @@ def test_user_registration_not_preexisting(client):
 
 
 #  TESTS THAT USERS CAN CREATE NEW GROUPS
-def test_create_groups(client):
+def test_create_groups(client, mock_mail_send):
     #  Logs in a user
     staff = Staff(
         staff_username="test_user",
@@ -267,6 +277,8 @@ def test_create_groups(client):
         data={"staff_username": "test_user", "password": "testUser123"},
         follow_redirects=True,
     )
+
+    mock_mail_send.assert_called_once()  #  Check that the email sending function was called
     assert response.status_code == 200
     #   Log in successful
 
