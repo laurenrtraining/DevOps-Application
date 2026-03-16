@@ -7,7 +7,6 @@ from flask import (
     url_for,
     session,
     abort,
-    jsonify,
 )
 import os
 from database.database import (
@@ -115,10 +114,6 @@ def sign_in():
             session["mfa_code"] = code
 
             redirect_url = url_for("mfa_verify")
-
-            if os.environ.get("RENDER") == "true":
-                return jsonify({"redirect": redirect_url, "mfa_code": code})
-
             send_email(user.staff_email, code)
             return redirect(redirect_url)
             # these call route through the name of the funtion, not the html route - makes the code tidier
